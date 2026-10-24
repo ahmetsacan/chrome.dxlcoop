@@ -9,7 +9,21 @@ This project is not currently licensed for redistribution or commercial use.
 ---
 
 # Features
-* Filter the list of jobs using a query. Query may contain multiple words. You may separate the words with "OR" or "AND" (use only one of these). When not provided, the words are combined with "AND" logic, searching for jobs that contain all of the words.
+
+* Display detailed job information directly within the job cart and search results, without having to open each job individually.
+
+* Select which job details to display, including company information, position description, qualifications, application instructions, location, compensation, and requirements. Selections are remembered between browsing sessions.
+
+* Cache downloaded job details locally to improve performance and avoid repeatedly retrieving the same information. The cache can be cleared at any time.
+
+* Search the displayed job information using one or more terms. Matching text is highlighted for easier review.
+
+* Filter the list of jobs using a query. Multiple search terms can be combined using `AND` or `OR` (case-insensitive). If no operator is specified, `AND` is assumed. For example, `python finance` is equivalent to `python AND finance`, while `python OR finance` matches jobs containing either term.
+
+* Download detailed job information as TSV or CSV, with individual job attributes stored in separate columns for further analysis in Excel or other software.
+
+* When filtering is enabled, TSV and CSV downloads contain only the jobs matching the current filter.
+
 
 ---
 # Disclaimer
