@@ -1,0 +1,90 @@
+/*
+ * DxlCoop - Drexel Co-op Job View Enhancer
+ *
+ * Copyright (c) 2026 Ahmet Sacan.
+ * All rights reserved.
+ */
+
+#dxlcoop-options {
+    margin: 8px 0;
+    padding: 8px 10px;
+    border: 1px solid #aaa;
+    background: #f5f5f5;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+}
+
+#dxlcoop-options label {
+    display: inline-block;
+    margin-right: 6px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+#dxlcoop-options input[type="checkbox"] {
+    margin: 0 0px 0 6px;
+    padding: 0;
+    vertical-align: middle;
+}
+
+#dxlcoop-options button {
+    margin-left: 12px;
+}
+
+#dxlcoop-clear-cache {
+    padding: 2px 8px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.dxlcoop-details {
+    margin: 8px 0 5px 15px;
+    padding: 8px 10px;
+    border-left: 3px solid #888;
+    background: #f8f8f8;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+.dxlcoop-field {
+    margin: 0 0 10px 0;
+}
+
+.dxlcoop-field:last-child {
+    margin-bottom: 0;
+}
+
+.dxlcoop-field-name {
+    margin-bottom: 2px;
+    font-weight: bold;
+}
+
+.dxlcoop-field-value {
+    white-space: pre-wrap;
+}
+
+.dxlcoop-status {
+    font-style: italic;
+}
+
+.dxlcoop-error {
+    font-weight: bold;
+}
+
+#dxlcoop-search {
+    margin-left: 12px;
+    width: 160px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+mark.dxlcoop-highlight {
+    background: yellow;
+    color: inherit;
+    padding: 0;
+}
