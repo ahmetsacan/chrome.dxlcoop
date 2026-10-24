@@ -187,29 +187,24 @@ const fields = [
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.id = 'dxlcoop-search';
-    searchInput.placeholder = 'search';
+    searchInput.placeholder = 'search & filter';
     searchInput.addEventListener('input', applySearch);
     div.appendChild(searchInput);
 
-    const filterLabel = document.createElement('label');
-    const filterCheckbox = document.createElement('input');
-    filterCheckbox.type = 'checkbox';
-    filterCheckbox.id = 'dxlcoop-filter';
-    filterCheckbox.addEventListener('change', applySearch);
-    filterLabel.append(filterCheckbox, document.createTextNode(' filter'));
-    div.appendChild(filterLabel);
 
     const downloadTSVButton = document.createElement('button');
     downloadTSVButton.type = 'button';
     downloadTSVButton.id = 'dxlcoop-download-tsv';
-    downloadTSVButton.textContent = 'Download TSV';
+    downloadTSVButton.textContent = 'TSV';
+    downloadTSVButton.title = 'Download job list as TSV file';
     downloadTSVButton.addEventListener('click', () => downloadDelimited('tsv'));
     div.appendChild(downloadTSVButton);
 
     const downloadCSVButton = document.createElement('button');
     downloadCSVButton.type = 'button';
     downloadCSVButton.id = 'dxlcoop-download-csv';
-    downloadCSVButton.textContent = 'Download CSV';
+    downloadCSVButton.textContent = 'CSV';
+    downloadCSVButton.title = 'Download job list as CSV file';
     downloadCSVButton.addEventListener('click', () => downloadDelimited('csv'));
     div.appendChild(downloadCSVButton);
 
@@ -217,6 +212,7 @@ const fields = [
     clearButton.type = 'button';
     clearButton.id = 'dxlcoop-clear-cache';
     clearButton.textContent = 'Clear Cache';
+    clearButton.title = 'Clear cached job details';
     clearButton.addEventListener('click', clearCache);
     div.appendChild(clearButton);
 
@@ -720,16 +716,15 @@ const fields = [
     return { terms, operator };
   }
   // ---------------------------------------------------------------------
-  function applySearch() {
-    const searchInput = document.getElementById('dxlcoop-search');
-    const filterCheckbox = document.getElementById('dxlcoop-filter');
+function applySearch() {
+  const searchInput = document.getElementById('dxlcoop-search');
 
-    if (!searchInput)
-      return;
+  if (!searchInput)
+    return;
 
-    const query = parseSearchQuery(searchInput.value);
-    const filter = !!filterCheckbox?.checked;
-
+    const searchText = searchInput.value.trim();
+    const query = parseSearchQuery(searchText);
+  
     for (const job of jobs) {
       /*
        * Remove highlights from the previous search.
@@ -795,7 +790,7 @@ const fields = [
        * Filtering applies to the complete query, not to each
        * individual term.
        */
-      const hide = query.terms.length && filter && !found;
+      const hide = searchText !== '' && !found;
 
       for (const row of job.rows)
         row.style.display = hide ? 'none' : '';
@@ -860,11 +855,17 @@ const fields = [
     }
 
     try {
+      const searchText =
+        document.getElementById('dxlcoop-search')?.value.trim() || '';
+
+      const downloadJobs = searchText
+        ? jobs.filter(job => job.rows.some(row => row.style.display !== 'none'))
+        : jobs;
       /*
        * Download every job regardless of the Show Details state.
        * fetchJob() will use memory/local cache when available.
        */
-      const results = await Promise.all(jobs.map(async job => {
+      const results = await Promise.all(downloadJobs.map(async job => {
         try {
           return await fetchJob(job);
         } catch (e) {
