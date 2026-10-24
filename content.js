@@ -682,6 +682,43 @@ const fields = [
     return found;
   }
 
+    // ---------------------------------------------------------------------
+  function parseSearchQuery(query) {
+    query = query.trim();
+
+    if (!query)
+      return { terms: [], operator: 'AND' };
+
+    const hasAND = /\bAND\b/i.test(query);
+    const hasOR  = /\bOR\b/i.test(query);
+
+    let operator;
+    let terms;
+
+    if (hasOR && !hasAND) {
+      operator = 'OR';
+      terms = query.split(/\s+OR\s+/i);
+    } else {
+      /*
+       * Default to AND.
+       *
+       * This handles:
+       *   python matlab
+       *   python AND matlab
+       *
+       * If AND and OR are both used, they are treated simply as
+       * separators with AND logic.
+       */
+      operator = 'AND';
+      terms = query.split(/\s+(?:AND|OR)\s+|\s+/i);
+    }
+
+    terms = terms
+      .map(term => term.trim())
+      .filter(Boolean);
+
+    return { terms, operator };
+  }
   // ---------------------------------------------------------------------
   function applySearch() {
     const searchInput = document.getElementById('dxlcoop-search');
@@ -690,39 +727,75 @@ const fields = [
     if (!searchInput)
       return;
 
-    const term = searchInput.value.trim();
+    const query = parseSearchQuery(searchInput.value);
     const filter = !!filterCheckbox?.checked;
 
     for (const job of jobs) {
       /*
-       * Clear highlights first so every search starts with the original
-       * displayed DOM.
+       * Remove highlights from the previous search.
        */
       for (const row of job.rows)
         clearSearchHighlights(row);
 
-      /*
-       * Details are normally inside the first row, but keep this explicit
-       * in case their placement changes later.
-       */
       if (job.details && !job.rows.some(row => row.contains(job.details)))
         clearSearchHighlights(job.details);
 
-      let found = false;
+      /*
+       * Determine whether each search term occurs anywhere in the
+       * displayed information for this job.
+       */
+      const matches = query.terms.map(term => {
+        let found = false;
 
-      if (term) {
         for (const row of job.rows) {
-          if (highlightSearchText(row, term))
+          if (row.textContent.toLowerCase().includes(term.toLowerCase())) {
             found = true;
+            break;
+          }
         }
 
-        if (job.details &&
+        if (!found &&
+            job.details &&
             !job.rows.some(row => row.contains(job.details)) &&
-            highlightSearchText(job.details, term))
+            job.details.textContent.toLowerCase().includes(term.toLowerCase()))
           found = true;
+
+        return found;
+      });
+
+      /*
+       * Determine whether the whole query matches this job.
+       */
+      let found = true;
+
+      if (query.terms.length) {
+        found = query.operator === 'OR'
+          ? matches.some(Boolean)
+          : matches.every(Boolean);
       }
 
-      const hide = !!term && filter && !found;
+      /*
+       * Highlight every individual term that actually occurs.
+       */
+      for (let i = 0; i < query.terms.length; i++) {
+        if (!matches[i])
+          continue;
+
+        const term = query.terms[i];
+
+        for (const row of job.rows)
+          highlightSearchText(row, term);
+
+        if (job.details &&
+            !job.rows.some(row => row.contains(job.details)))
+          highlightSearchText(job.details, term);
+      }
+
+      /*
+       * Filtering applies to the complete query, not to each
+       * individual term.
+       */
+      const hide = query.terms.length && filter && !found;
 
       for (const row of job.rows)
         row.style.display = hide ? 'none' : '';

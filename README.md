@@ -9,10 +9,16 @@ This project is not currently licensed for redistribution or commercial use.
 ---
 
 # Features
-
+* Filter the list of jobs using a query. Query may contain multiple words. You may separate the words with "OR" or "AND" (use only one of these). When not provided, the words are combined with "AND" logic, searching for jobs that contain all of the words.
 
 ---
+# Disclaimer
 
+This extension is provided "as is" and without warranties of any kind, express or implied. The author makes no guarantee that the extension will function correctly, reliably, or continuously, or that the information it displays, processes, filters, or downloads will be complete or accurate.
+
+Use of this extension is entirely at your own risk. The author assumes no responsibility or liability for any errors, omissions, data loss, unintended actions, missed job opportunities, or other damages or consequences arising from the use or inability to use this extension.
+
+This extension is an independent project and is not affiliated with, endorsed by, or supported by Drexel University, Ellucian, or their affiliates. Users are responsible for verifying important information directly through the official Drexel systems before taking action.
 # Privacy Policy
 The extension uses the storage permission to cache job details, to avoid repeatedly fetching the same job details. No personal data is collected, transmitted, or shared. All stored data remains on the user's device using the Chrome Extensions Storage API.
 
