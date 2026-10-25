@@ -26,7 +26,8 @@ const routeFields = [
   const defaults = {
     showDetails: false, company: false, description: true, qualifications: true,
     instructions: false, location: false, compensation: false, requirements: false,
-    startingAddresses: [],  distance: false, time: false, sortBy: ''
+    startingAddresses: [],  distance: false, time: false, sortBy: '',
+    showRatings: true, sortByRating: true
   };
 
   const path = location.pathname;
@@ -52,6 +53,7 @@ let state = { ...defaults };
   let jobs = [];
   const cache = new Map();
   let startingAddresses = [];
+  let ratings = {};
 
   // ---------------------------------------------------------------------  
   function storageGet(key) {
@@ -169,7 +171,9 @@ function appendOptionsLink(container, text, linkText) {
         link,
         details: null,
         data: null,
-        rows
+        rows,
+        ratingKey: link.textContent.trim(),
+        rating: 0
       };
     });
   }
@@ -438,6 +442,7 @@ async function loadAllSearchPages(button) {
      * additional rows existed.
      */
 jobs = findJobs();
+renderAllRatings();
 
 await Promise.all(jobs.map(async job => {
   try {
@@ -451,10 +456,8 @@ await Promise.all(jobs.map(async job => {
   }
 }));
 
-if (state.sortBy) {
-  await updateDrivingData(true);
-  sortJobs();
-}    
+  if (state.sortBy) await updateDrivingData(true);
+  if (state.sortBy || state.sortByRating) sortJobs();
 
     /*
      * The button is no longer useful after all pages are loaded.
@@ -516,6 +519,62 @@ if (state.sortBy) {
       div.appendChild(label);
     }
 
+
+const ratingLabel = document.createElement('label');
+
+const ratingCheckbox = document.createElement('input');
+ratingCheckbox.type = 'checkbox';
+ratingCheckbox.id = 'dxlcoop-show-ratings';
+ratingCheckbox.checked = !!state.showRatings;
+
+ratingCheckbox.addEventListener('change', async () => {
+  state.showRatings = ratingCheckbox.checked;
+
+  await storageSet({
+    [pageKey]: state
+  });
+
+  renderAllRatings();
+});
+
+ratingLabel.append(
+  ratingCheckbox,
+  document.createTextNode(' Ratings')
+);
+
+div.appendChild(ratingLabel);
+
+const ratingSortLabel = document.createElement('label');
+
+const ratingSortCheckbox = document.createElement('input');
+ratingSortCheckbox.type = 'checkbox';
+ratingSortCheckbox.id = 'dxlcoop-sort-rating';
+ratingSortCheckbox.checked = !!state.sortByRating;
+
+ratingSortCheckbox.addEventListener('change', async () => {
+  state.sortByRating = ratingSortCheckbox.checked;
+
+  await storageSet({
+    [pageKey]: state
+  });
+
+  /*
+   * Sorting is triggered by changing the sort option itself,
+   * but NOT by clicking an individual job's rating stars.
+   */
+  sortJobs();
+});
+
+ratingSortLabel.append(
+  ratingSortCheckbox,
+  document.createTextNode(' Sort by rating')
+);
+
+div.appendChild(ratingSortLabel);
+
+
+
+
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.id = 'dxlcoop-search';
@@ -533,6 +592,7 @@ if (state.sortBy) {
     div.appendChild(searchInput);
 
 
+    
 
 
 const sortSelect = document.createElement('select');
@@ -751,18 +811,33 @@ function sortJobs() {
   const sortBy =
     document.getElementById('dxlcoop-sort')?.value || '';
 
-  if (!sortBy)
-    return;
+if (!sortBy && !state.sortByRating)
+  return;
 
   const descending = sortBy.endsWith('-desc');
 
-  const sorted = jobs
-    .map((job, index) => ({
-      job,
-      index,
-      value: routeSortValue(job, sortBy)
-    }))
-    .sort((a, b) => {
+
+const sorted = jobs
+  .map((job, index) => ({
+    job,
+    index,
+    rating: jobRating(job) || 3,
+    value: sortBy
+      ? routeSortValue(job, sortBy)
+      : null
+  }))
+  .sort((a, b) => {
+    /*
+     * Rating is always the primary sort, highest first.
+     * Unrated jobs have rating 0.
+     */
+    if (state.sortByRating && a.rating !== b.rating)
+      return b.rating - a.rating;
+
+    /*
+     * Within each rating, apply the selected route sort.
+     */
+    if (sortBy) {
       if (a.value == null && b.value == null)
         return a.index - b.index;
 
@@ -772,14 +847,16 @@ function sortJobs() {
       if (b.value == null)
         return -1;
 
-      if (a.value === b.value)
-        return a.index - b.index;
+      if (a.value !== b.value)
+        return descending
+          ? b.value - a.value
+          : a.value - b.value;
+    }
 
-      return descending
-        ? b.value - a.value
-        : a.value - b.value;
-    })
-    .map(item => item.job);
+    return a.index - b.index;
+  })
+  .map(item => item.job);
+
 
 const tbody = table.tBodies[0] || table;
 
@@ -2062,16 +2139,18 @@ function applySearch() {
   }
   // ---------------------------------------------------------------------  
   async function init() {
-    const saved = await storageGet([pageKey, 'startingAddresses','googleRoutesApiKey']);
+    const saved = await storageGet([pageKey, 'startingAddresses','googleRoutesApiKey','ratings']);
 
     if (saved[pageKey] && typeof saved[pageKey] === 'object')
       state = { ...defaults, ...saved[pageKey] };
 
     startingAddresses = Array.isArray(saved.startingAddresses) ? saved.startingAddresses : [];
     googleRoutesApiKey =  saved.googleRoutesApiKey?.trim() || '';  
+    ratings = saved.ratings && typeof saved.ratings === 'object' ? saved.ratings : {};
 
 jobs = findJobs();
 createOptions();
+renderAllRatings();
 
 /*
  * Load job data so employer names can always be added to job titles.
@@ -2089,10 +2168,8 @@ await Promise.all(jobs.map(async job => {
   }
 }));
 
-if (state.sortBy) {
-  await updateDrivingData(true);
-  sortJobs();
-}
+  if (state.sortBy) await updateDrivingData(true);
+  if (state.sortBy || state.sortByRating) sortJobs();
 
 if (state.showDetails)
   await showAll();
@@ -2122,6 +2199,123 @@ function allStartingAddresses() {
 
   return result;
 }
+// ---------------------------------------------------------------------
+function createRatingStars(job) {
+  const nobr = document.createElement('nobr');
+  nobr.className = 'dxlcoop-rating';
+
+  const rating = jobRating(job);
+
+  for (let i = 1; i <= 5; i++) {
+    const img = document.createElement('img');
+
+    img.src = chrome.runtime.getURL('star.png');
+    img.className = 'dxlcoop-rating-star';
+
+    if (i > rating)
+      img.classList.add('dxlcoop-rating-star-faded');
+
+    img.alt = `${i} star${i === 1 ? '' : 's'}`;
+    img.title = rating === i
+      ? `Remove ${i}-star rating`
+      : `Rate ${i} stars`;
+
+    img.addEventListener('click', async event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      /*
+       * Clicking the current rating unsets it.
+       */
+      await setJobRating(
+        job,
+        jobRating(job) === i ? 0 : i
+      );
+    });
+
+    nobr.appendChild(img);
+  }
+
+  return nobr;
+}
+
+
+// ---------------------------------------------------------------------
+function jobRating(job) {
+  return Number(ratings[job.ratingKey]) || 0;
+}
+
+// ---------------------------------------------------------------------
+async function setJobRating(job, rating) {
+  if (rating)
+    ratings[job.ratingKey] = rating;
+  else
+    delete ratings[job.ratingKey];
+
+  job.rating = rating;
+
+  await storageSet({ ratings });
+
+  renderJobRating(job);
+
+  /*
+   * Deliberately do NOT call sortJobs().
+   * Rating changes should not make the job jump around.
+   */
+}
+// ---------------------------------------------------------------------
+function ratingCell(job) {
+  const row = job.link.closest('tr');
+
+  if (!row)
+    return null;
+
+  const columnIndex =
+    pageKey === 'cart' ? 0 : 1;
+
+  return row.cells[columnIndex] || null;
+}
+
+// ---------------------------------------------------------------------
+function renderJobRating(job) {
+  /*
+   * Remove an existing rating widget first.
+   */
+  for (const existing of job.rows[0]?.querySelectorAll(
+    '.dxlcoop-rating'
+  ) || [])
+    existing.remove();
+
+  if (!state.showRatings)
+    return;
+
+  const cell = ratingCell(job);
+
+  if (!cell)
+    return;
+
+  const stars = createRatingStars(job);
+
+  /*
+   * Rating appears at the beginning of the requested cell.
+   */
+  cell.insertBefore(stars, cell.firstChild);
+  cell.insertBefore(
+    document.createTextNode(' '),
+    stars.nextSibling
+  );
+}
+
+// ---------------------------------------------------------------------
+function renderAllRatings() {
+  for (const job of jobs)
+    renderJobRating(job);
+}
+
+
+
+
+
   // ---------------------------------------------------------------------
   function delimitedValue(value, delimiter) {
     if (value == null)
@@ -2349,6 +2543,11 @@ const results = await Promise.all(downloadJobs.map(async job => {
       }
     }
   }
+
+
+
+
+
 
   init();
 })();

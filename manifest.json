@@ -16,5 +16,9 @@
     "css": ["content.css"],
     "run_at": "document_idle"
   }],
+  "web_accessible_resources": [{
+    "resources": ["star.png"],
+    "matches": ["<all_urls>"]
+  }],
   "options_page": "options.html"
 }
