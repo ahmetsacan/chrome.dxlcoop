@@ -2,6 +2,19 @@
 
 const API_KEY_STORAGE_KEY = 'googleRoutesApiKey';
 const ADDRESSES_STORAGE_KEY = 'startingAddresses';
+const ROUTE_CACHE_PREFIX = 'dxlcoop.routecache:';
+
+function storageRemove(keys) {
+  return new Promise(resolve => chrome.storage.local.remove(keys, resolve));
+}
+
+async function clearDrivingCache() {
+  await GoogleRoutes.clearCache();
+  showStatus('Saved driving distances & times cleared');
+}
+
+document.getElementById('clearDrivingCache').addEventListener('click', clearDrivingCache);
+
 
 let saveStatusTimer = null;
 

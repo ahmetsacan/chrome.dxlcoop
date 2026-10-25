@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Improves Drexel co-op job viewing by displaying job details inline in job cart and search results. Adds text filtering and download functionality.",
   "permissions": ["storage"],
-  "host_permissions": ["https://banner.drexel.edu/*"],
+  "host_permissions": ["https://banner.drexel.edu/*","https://routes.googleapis.com/*"],
   "content_scripts": [{
     "matches": [
       "https://banner.drexel.edu/duprod/hwczksjsd.P_StudentJobCart*",
@@ -12,7 +12,7 @@
       "https://banner.drexel.edu/duprod/hwczkglbp.P_AlterOverridePaging*",
       "https://banner.drexel.edu/duprod/hwczksrmr.P_StudentReqMaintIntrvReq*"
     ],
-    "js": ["content.js"],
+    "js": [  "googleroutes.js","content.js"],
     "css": ["content.css"],
     "run_at": "document_idle"
   }],
