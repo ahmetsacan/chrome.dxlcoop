@@ -157,7 +157,13 @@ const pageKey =
 
     return '';
   }
-  // ---------------------------------------------------------------------  
+// ---------------------------------------------------------------------
+function updateDetailOptionsVisibility() {
+  for (const label of document.querySelectorAll('.dxlcoop-detail-option'))
+    label.style.display = state.showDetails ? '' : 'none';
+}
+
+// ---------------------------------------------------------------------  
   function createOptions() {
     const div = document.createElement('div');
     div.id = 'dxlcoop-options';
@@ -165,6 +171,7 @@ const pageKey =
 
     for (const opt of options) {
       const label = document.createElement('label');
+      if (opt.key !== 'showDetails')  label.className = 'dxlcoop-detail-option';      
       const cb = document.createElement('input');
       cb.type = 'checkbox';
       cb.dataset.key = opt.key;
@@ -175,8 +182,13 @@ const pageKey =
         await storageSet({ [pageKey]: state });
 
         if (opt.key === 'showDetails') {
-          if (state.showDetails) await showAll();
-          else hideAll();
+          updateDetailOptionsVisibility();
+
+          if (state.showDetails)
+            await showAll();
+          else
+            hideAll();
+
         } else if (state.showDetails) {
           renderAll();
         }
@@ -185,6 +197,7 @@ const pageKey =
       label.append(cb, document.createTextNode(' ' + opt.label));
       div.appendChild(label);
     }
+    updateDetailOptionsVisibility();
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
