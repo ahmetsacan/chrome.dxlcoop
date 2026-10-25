@@ -1,0 +1,102 @@
+body {
+    max-width: 800px;
+    margin: 30px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 28px;
+}
+
+#googleRoutesApiKey {
+    margin-top: 5px;
+    padding: 5px;
+}
+
+button {
+    margin-left: 5px;
+    padding: 4px 10px;
+}
+
+#addresses {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 700px;
+}
+
+#addresses th {
+    text-align: left;
+    padding: 3px 6px;
+}
+
+#addresses td {
+    padding: 3px 6px;
+}
+
+#addresses th:first-child,
+#addresses td:first-child {
+    width: 140px;
+}
+
+.address-name,
+.address-value {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 5px;
+}
+
+#addAddress {
+    text-decoration: none;
+}
+
+#addAddress:hover {
+    text-decoration: underline;
+}
+
+#status {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    padding: 7px 30px;
+
+    background: #f5f5f5;
+    border-bottom: 1px solid #ccc;
+
+    font-weight: bold;
+    font-size: 18px;
+    background: transparent;
+    color: red;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+#status.visible {
+    opacity: 1;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+#addresses th:last-child,
+#addresses td:last-child {
+    width: 60px;
+    white-space: nowrap;
+}
+
+.remove-address {
+    text-decoration: none;
+}
+
+.remove-address:hover {
+    text-decoration: underline;
+}

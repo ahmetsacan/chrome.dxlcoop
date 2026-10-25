@@ -24,10 +24,12 @@ const fields = [
   };
 
   const path = location.pathname;
-  const pageKey = path.endsWith('/hwczksjsd.P_StudentJobCart') ? 'cart' :
-                  path.endsWith('/hwczksjsc.P_StudentJobSearchValidate') ||
-                  path.endsWith('/hwczkglbp.P_AlterOverridePaging')
-                   ? 'search' : null;
+const pageKey =
+  path.endsWith('/hwczksjsd.P_StudentJobCart') ? 'cart' :
+  path.endsWith('/hwczksrmr.P_StudentReqMaintIntrvReq') ? 'interviews' :
+  path.endsWith('/hwczksjsc.P_StudentJobSearchValidate') ||
+  path.endsWith('/hwczkglbp.P_AlterOverridePaging') ? 'search' :
+  null;
                    console.log('pageKey:', pageKey);
   if (!pageKey) return;
 
@@ -95,11 +97,11 @@ const fields = [
           rows.push(firstRow);
 
         } else {
-          /*
-           * Search results have a title row followed by zero or more
-           * informational rows. They belong to this job until the next
-           * row containing a JobDisplay link.
-           */
+/*
+ * Search and interviews pages have a title row followed by zero
+ * or more additional rows. They belong to this job until the next
+ * row containing a JobDisplay link.
+ */
           let row = firstRow;
 
           while (row) {

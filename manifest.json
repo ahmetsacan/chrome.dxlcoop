@@ -9,10 +9,12 @@
     "matches": [
       "https://banner.drexel.edu/duprod/hwczksjsd.P_StudentJobCart*",
       "https://banner.drexel.edu/duprod/hwczksjsc.P_StudentJobSearchValidate*",
-      "https://banner.drexel.edu/duprod/hwczkglbp.P_AlterOverridePaging*"
+      "https://banner.drexel.edu/duprod/hwczkglbp.P_AlterOverridePaging*",
+      "https://banner.drexel.edu/duprod/hwczksrmr.P_StudentReqMaintIntrvReq*"
     ],
     "js": ["content.js"],
     "css": ["content.css"],
     "run_at": "document_idle"
-  }]
+  }],
+  "options_page": "options.html"
 }

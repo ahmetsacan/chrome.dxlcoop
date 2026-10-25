@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>DxlCoop Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+
+<div id="status"></div>
+
+<h1>DxlCoop Options</h1>
+
+<h2>Starting Addresses</h2>
+
+<p>
+  Starting addresses for driving map link and distance calculations:
+</p>
+
+<table id="addresses">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Address</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<p>
+  <a href="#" id="addAddress">+ Add new address</a>
+</p>
+
+<h2>Google Routes API</h2>
+
+<p>
+  DxlCoop can use the Google Routes API to calculate estimated driving
+  distances to job locations.
+</p>
+
+<p>
+  <label for="googleRoutesApiKey">Google Routes API Key:</label><br>
+
+  <input
+    type="password"
+    id="googleRoutesApiKey"
+    size="60"
+    autocomplete="off"
+  >
+
+  <button type="button" id="showApiKey">Show</button>
+</p>
+
+
+<hr>
+<h2>Obtaining a Google Routes API Key</h2>
+
+<ol>
+  <li>
+    Visit the
+    <a href="https://console.cloud.google.com/apis/dashboard" target="_blank">
+      Google Cloud dashboard
+    </a>.
+  </li>
+
+  <li>Create a Project if you don't already have one.</li>
+
+  <li>Click the <strong>Enable APIs and services</strong> button.</li>
+
+  <li>
+    Search for <strong>Routes API</strong> and select
+    <strong>Routes API</strong> from the search results.
+  </li>
+
+  <li>Select <strong>Enable</strong>.</li>
+
+  <li>
+    Follow the instructions to enable the API. Google may ask for a
+    credit card as part of signing up for Google Cloud. Select the
+    free option where available. Usage within Google's applicable
+    free usage limits will not incur charges.
+  </li>
+</ol>
+
+<script src="options.js"></script>
+
+</body>
+</html>
